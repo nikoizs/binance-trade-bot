@@ -125,6 +125,9 @@ class BinanceAPIManager:
     def get_min_notional(self, origin_symbol: str, target_symbol: str):
         return float(self.get_symbol_filter(origin_symbol, target_symbol, "MIN_NOTIONAL")["minNotional"])
 
+    def get_min_quantity(self, origin_symbol: str, target_symbol: str):
+        return float(self.get_symbol_filter(origin_symbol, target_symbol, "LOT_SIZE")["minQty"])
+        
     def wait_for_order(self, origin_symbol, target_symbol, order_id):
         while True:
             try:
@@ -132,10 +135,10 @@ class BinanceAPIManager:
                 break
             except BinanceAPIException as e:
                 self.logger.info(e)
-                time.sleep(1)
+                time.sleep(10)
             except Exception as e:  # pylint: disable=broad-except
                 self.logger.info(f"Unexpected Error: {e}")
-                time.sleep(1)
+                time.sleep(10)
 
         self.logger.info(order_status)
 
@@ -212,6 +215,7 @@ class BinanceAPIManager:
         from_coin_price = from_coin_price or self.get_all_market_tickers().get_price(origin_symbol + target_symbol)
 
         origin_tick = self.get_alt_tick(origin_symbol, target_symbol)
+
         return math.floor(target_balance * 10 ** origin_tick / from_coin_price) / float(10 ** origin_tick)
 
     def _buy_alt(self, origin_coin: Coin, target_coin: Coin, all_tickers):
@@ -227,8 +231,16 @@ class BinanceAPIManager:
         from_coin_price = all_tickers.get_price(origin_symbol + target_symbol)
 
         order_quantity = self._buy_quantity(origin_symbol, target_symbol, target_balance, from_coin_price)
-        self.logger.info(f"BUY QTY {order_quantity} of <{origin_symbol}>")
-
+        self.logger.info(f"BUY QTY {order_quantity}, origin_coin: {origin_symbol}, target coing:{target_symbol}")
+        min_notional = self.get_min_notional(origin_symbol, target_symbol)
+        min_quantity = self.get_min_quantity(origin_symbol, target_symbol)
+        if order_quantity < min_quantity:
+            self.logger.warning(f"BUY QTY {order_quantity} is too low. min_quantity={min_quantity}")
+            return None
+        order_amount = order_quantity * from_coin_price
+        if (order_amount < min_notional):
+            self.logger.warning(f"BUY Amount {order_amount} is too low. MIN_NOTIONAL={min_notional}")
+            return None
         # Try to buy until successful
         order = None
         while order is None:
@@ -241,7 +253,7 @@ class BinanceAPIManager:
                 self.logger.info(order)
             except BinanceAPIException as e:
                 self.logger.info(e)
-                time.sleep(1)
+                time.sleep(10)
             except Exception as e:  # pylint: disable=broad-except
                 self.logger.info(f"Unexpected Error: {e}")
 
