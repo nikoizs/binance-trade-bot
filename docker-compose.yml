@@ -2,8 +2,8 @@ version: "3"
 
 services:
   crypto-trading:
-    image: nikos-bot:2
-    container_name: binance_trader
+    image: binance-diy-bot:3
+    container_name: binance_diy_bot
     working_dir: /app
     volumes:
       - ./user.cfg:/app/user.cfg
