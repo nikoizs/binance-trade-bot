@@ -10,6 +10,7 @@ services:
       - ./supported_coin_list:/app/supported_coin_list
       - ./data:/app/data
       - ./logs:/app/logs
+      - ./config:/app/config
     command: python -m binance_trade_bot
     environment:
       - PYTHONUNBUFFERED=1
