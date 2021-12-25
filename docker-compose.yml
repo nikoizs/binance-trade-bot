@@ -2,14 +2,15 @@ version: "3"
 
 services:
   crypto-trading:
-    image: binance-diy-bot:3
+    image: izsakniko/binance-bot:3.0
     container_name: binance_diy_bot
     working_dir: /app
     volumes:
-      - ./user.cfg:/app/user.cfg
-      - ./supported_coin_list:/app/supported_coin_list
-      - ./data:/app/data
-      - ./logs:/app/logs
+      - ${USERDIR}/docker/binance-bot-v3/user.cfg:/app/user.cfg
+      - ${USERDIR}/docker/binance-bot-v3/supported_coin_list:/app/supported_coin_list
+      - ${USERDIR}/docker/binance-bot-v3/data:/app/data
+      - ${USERDIR}/docker/binance-bot-v3/logs:/app/logs
+      - ${USERDIR}/docker/binance-bot-v3/config:/app/config
     command: python -m binance_trade_bot
     environment:
       - PYTHONUNBUFFERED=1
