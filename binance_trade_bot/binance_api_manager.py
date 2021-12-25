@@ -38,7 +38,7 @@ class BinanceAPIManager:
             self.logger,
         )
 
-    @cached(cache=TTLCache(maxsize=1, ttl=43200))
+    @cached(cache=TTLCache(maxsize=1, ttl=7200))
     def get_trade_fees(self) -> Dict[str, float]:
         return {ticker["symbol"]: float(ticker["takerCommission"]) for ticker in self.binance_client.get_trade_fee()}
 
@@ -138,14 +138,14 @@ class BinanceAPIManager:
             if _filter["filterType"] == filter_type
         )
 
-    @cached(cache=TTLCache(maxsize=2000, ttl=43200))
+    @cached(cache=TTLCache(maxsize=2000, ttl=7200))
     def get_alt_tick(self, origin_symbol: str, target_symbol: str):
         step_size = self.get_symbol_filter(origin_symbol, target_symbol, "LOT_SIZE")["stepSize"]
         if step_size.find("1") == 0:
             return 1 - step_size.find(".")
         return step_size.find("1") - 1
 
-    @cached(cache=TTLCache(maxsize=2000, ttl=43200))
+    @cached(cache=TTLCache(maxsize=2000, ttl=7200))
     def get_min_notional(self, origin_symbol: str, target_symbol: str):
         return float(self.get_symbol_filter(origin_symbol, target_symbol, "MIN_NOTIONAL")["minNotional"])
 

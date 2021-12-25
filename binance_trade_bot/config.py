@@ -76,7 +76,8 @@ class Config:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
 
         self.SELL_TIMEOUT = os.environ.get("SELL_TIMEOUT") or config.get(USER_CFG_SECTION, "sell_timeout")
         self.BUY_TIMEOUT = os.environ.get("BUY_TIMEOUT") or config.get(USER_CFG_SECTION, "buy_timeout")
-
+        self.LOGGING_LEVEL = os.environ.get("LOGGING_LEVEL") or config.get(USER_CFG_SECTION, "logging_level")
+        self.LOGGING_SERVICE= os.environ.get("LOGGING_SERVICE") or config.get(USER_CFG_SECTION, "logging_service")
         order_type_map = {
             self.ORDER_TYPE_LIMIT: binance.client.Client.ORDER_TYPE_LIMIT,
             self.ORDER_TYPE_MARKET: binance.client.Client.ORDER_TYPE_MARKET,

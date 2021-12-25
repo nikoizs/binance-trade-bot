@@ -10,10 +10,11 @@ from .strategies import get_strategy
 
 
 def main():
-    logger = Logger()
-    logger.info("Starting")
-
     config = Config()
+    logger = Logger(logging_service=config.LOGGING_SERVICE,
+                    logging_level=config.LOGGING_LEVEL,
+                    enable_notifications=True)
+    logger.info("Starting")
     db = Database(logger, config)
     manager = BinanceAPIManager(config, db, logger)
     # check if we can access API feature that require valid config
